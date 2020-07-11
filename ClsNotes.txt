@@ -1,0 +1,727 @@
+What is Reactive Programming ?
+
+ Programming Paradigm(way).
+
+Java 8 , is functional style, object oriented pl.
+
+There is no such separate pl which adopts reactive programming alone, rather which is eXtended
+by other lanugages : ReactiveX ->through frameworks and libs  -reactiveX for java -Rxjava,
+for javascript - Rxjs.
+
+
+What is Reactive?
+
+  Oxford dictionary defines reactive  as "showing a response to a stimulus"
+
+Response :  The result
+Stimuls : trigge/actions ---Events
+
+ Get Response because of some events --- event driven programming model.
+
+Event dirven programming is extension of  oo.
+
+Style of communication
+
+1.sync /blocking communication
+   Caller is blocked for Callee until result is available
+   
+2.async communication.
+  Caller is released as soon as job is asigned to Callee, and Callee who processes
+  and return result/response back to Caller.
+
+
+      Caller-----send Req---|---callee is received---Processing
+
+async implementation 
+
+  1.Message driven model : MOM.
+
+      Caller-----send Req---|Message Broker---callee is received---Processing
+
+  2.language level async.
+
+    ->Async programs are designed with one design pattern "Reactor".
+
+   Conncurrency :(Multi threading)
+        ->Process - level threads - sequential - parrelsim
+        ->Worker - thread - async, parrelsim
+
+
+Does java / jvm supports nonblocking / async?
+   
+   Partially java supports - through Executor- Future based model, which is not fully nonblocking as per "reactive design" pattern.
+
+Nonbloking IO application:
+
+ java had api "nio" -  building blocking of all async apis on jvm.
+
+based on nio two projects were created
+
+1.Apache netty
+2.Apache MINA
+
+Apache netty is low level non blocking/async engine for building async / non blocking io applications for JVM.
+
+
+First entrise ready Project 
+
+1.Ecplise Vertx  -99% non blocking arch for jvm
+2.Spring WebFlux - only web layer is non blocking as now , 
+
+
+                              Spring Web Flux
+				 |
+			      Spring Container
+				  |
+			       Netty -engine
+				  |
+				jvm 
+
+*******************************************************************************************
+Event dirven programming is extension of  oo design pattern : Observable Design pattern.
+
+Reactive programming is collection of many design patterns and principles.
+
+ -Observable Design pattern
+ -Iterator Design pattern
+ -Functional style pattern
+
+
+
+ -Observable Design pattern
+				
+				Publisher/Owner/Producer
+					|
+	      -----------------------------------------------------------------			
+	     |                   |          |           |
+          Listeners            Subscriber  Subscriber Subscriber
+			
+
+
+How objects communicate
+
+      
+  By passing messages via method calls with intermediate object (Event).
+
+
+Publisher sends/publishes data with events via broker called notfication interface to subcribers
+
+
+
+
+				Publisher/Owner/Producer
+					|
+				     data + event(Event)
+					|
+			       Event Notification Interface
+					|
+	      -----------------------------------------------------------------			
+	     |                   |          |           |
+          Listeners            Subscriber  Subscriber Subscriber
+
+
+Subscribers are objects who are listening for events, once event is given, who process event and consume take.
+
+Legacy observer design pattern has only 1 thing
+
+  1.they will be able to send only data
+
+Have not addresssed the following
+  1.what if error is produced
+  2.what if the producer has stopped producing values. 
+
+Reactive programming address the above issues.
+
+Producer can send data,error, complete - events/signals
+
+				Publisher/Owner/Producer <---------Data Source(Device)
+					|
+				 data / error  & complete
+					|
+			       Event Notification Interface
+					|
+			------------------------------------- channels
+			|               |                  |
+                     data              error              complete
+
+			|		|		   |
+			------------------------------------
+					  |
+				      Subscriber
+			
+
+*******************************************************************************************
+Iterator Design Pattern design:
+
+				   DataSource-List/Collection -Object
+				    (1,2,3,4,5,6,7,8,9,10)
+					  |
+					Iterator - PULL Alogorthim- get/read/request(1)
+					   |
+				    Subscribers -add into HTTP OUTPUTSTREAM-1,2
+
+PULL Based iterator , is default iterator already implemented in many languages.
+
+Drawbacks of pull based iterator :
+
+1.both object should sync each other.
+2.only data will be pulled via iterator.next/get/read/request call
+3.Errors are handled via try...catch.
+4.No complete signal is given.
+5.all data must be loaded in advance- memory waste
+6.live data may not be processed on fly.
+
+
+PUSH BASED Iterator :  Reactive Implementation.
+
+
+
+	          Publisher/Owner/Producer <---------Data Source(Device)
+					|
+				  push data into memory over time.
+					|
+				  -----------------------------
+                                      1---2---3--4--error--5--|-->
+				  ------------------------------
+                        		|    
+				     emit event data,data -complete           	
+			
+				 data / error  & complete
+					|
+			       Event Notification Interface
+					|
+			------------------------------------- channels
+			|               |                  |
+                     data              error              complete
+
+			|		|		   |
+			------------------------------------
+					  |
+				      Subscriber
+
+
+ When error or complete signal is given, channel will be closed.
+**********************************************************************************************
+
+Reactive Programs are functional style based.
+
+ -Pure functions
+ -Immutablity
+ -Higher order functions: function composition.
+
+Reactive  = {observable + iterator(push) + functional style} 
+********************************************************************************************
+
+Reactive is just spec, what about implementation? who has given this implementation.
+
+Reactive spec initally implemented not as open source project , by netflex ->
+  RxJava 1.0 - open source.
+ 
+**********************************************************************************************
+
+Once Rxjava other extensions came into market,peopel started building reactive application.
+
+one point of time, people had confusion.
+
+Whether my system is Reactive?
+
+Many companies like ms,google,netflex,amzon....joined together who published one spec
+https://www.reactivemanifesto.org/
+**********************************************************************************************
+
+Where is reactive Programming ? Use case of Reactive Programming?
+
+
+   ********Data  Streaming and Processing in blocking and nonblocking *******
+
+Data Processing  y comapare with Batch processing.....
+
+Pipe lines : streaming of data.
+
+Stream :
+
+     Sequence of data / flow of data which is supplied and consumed 
+**********************************************************************************************
+
+Stream Types:
+
+1.Source Stream
+2.Intermediate Stream 
+
+ ->Up Stream
+ ->Down Stream
+********************************************************************************************
+
+Core Concepts in Reactive Programming:
+......................................
+
+1.Publisher
+   Publisher is Object
+2.Subscriber
+   Subscriber is also Object
+3.Stream
+  logical representation of data movement
+
+Java and Reactive Programming implementation:
+  Reactive programming spec 
+
+
+1.Rxjava 1.x
+2.Rxjava 2.x
+3.Project Reactor
+4.Java 9
+
+
+1.Rxjava 1.x && Rxjava 2.x
+
+Objects:
+
+Publisher
+  1.Observable
+	 2.Subject
+	    AsyncSubject...
+  	 3.Single
+         4.MayBe
+
+2.Observer
+   Subscriber who is listening for data.
+
+
+3.Operators
+    Operators are methods in java, which performes some data processing operations.
+
+Operators are like work stations in "assembly line analogy". Operators forms upstream and downstream.
+
+
+Features of operators:
+1.operators are functionalstyle apis 
+2.every operator is pure function- function never mutates the old stream,creates new stream
+3.operators are transformers which transforms/process data from the previous stream gives to next stream.
+
+4.Stream chain is linked via operators only and terminted by subscribers
+
+
+   Source----operator1()------Operator2()---OperatorN-----Subscriber
+
+Types :
+
+1.create
+2.transform
+3.filter
+4.coimbine
+5.error handling
+6.utility
+7.conditional and boolean operators
+8.math
+9.connectable
+10.backpressure.
+
+*********************************************************************************************
+
+Lab : Setup
+
+1.create Maven project
+ add rxjava 
+
+
+
+package io.reactivex;
+
+
+public interface ObservableSource<T> {
+
+    /**
+     * Subscribes the given Observer to this ObservableSource instance.
+     * @param observer the Observer, not null
+     * @throws NullPointerException if {@code observer} is null
+     */
+    void subscribe(@NonNull Observer<? super T> observer);
+}
+package com.cts.reactor;
+
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import lombok.extern.slf4j.Slf4j;
+
+
+class Subscriber implements Observer{
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {
+        System.out.println("On Subscribe");
+      //  d.dispose();
+    }
+
+    //if publisher sends data event and data , onNext method is called
+    @Override
+    public void onNext(@NonNull Object o) {
+        System.out.println("Data " + o);
+    }
+
+    //if publisher sends error , onError method is called
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("Error" + e.getMessage());
+    }
+
+    //if publisher finishes sending data
+    @Override
+    public void onComplete() {
+        System.out.println("done!");
+    }
+}
+@Slf4j
+public class RxjavaDemo {
+    public static void main(String[] args) {
+        //Create Publisher(Observable-Stream)
+
+        Observable publisher = Observable.just("Hello","Hai","Welcome","How are you?");
+        //Subscriber
+        publisher.subscribe(new Subscriber());
+
+        //functional style of subscriber
+        Observable<Integer> numberPublisher = Observable.just(1,2,3,4,5,6,7,8);
+
+        //Subscriber : annomous class
+        numberPublisher.subscribe(new Observer<Integer>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                System.out.println("On Subscribe - Number Publisher");
+
+            }
+            @Override
+            public void onNext(@NonNull Integer integer) {
+                log.info("Nos :" +integer);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                log.error(e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+                log.info("Done!!!");
+            }
+        });
+        //lambdas
+        Observable<Integer> numberPublisherLambda = Observable.just(1,2,3,4,5,6,7,8);
+        numberPublisherLambda.subscribe(data->log.info("Lambda " + data),err->{log.error(err.getMessage());},()->log.info("lambda done!"));
+
+        ///////Create Publisher , who pushes data,error,complete
+
+        Observable<String> createPublisher=Observable.create(stream->{
+            //push data into stream
+            stream.onNext("Hello");
+            stream.onNext("Hai");
+            stream.onNext("welcome");
+            stream.onError(new RuntimeException("something went wrong!!!!"));
+            stream.onNext("greeter");
+            stream.onNext("very good");
+            stream.onComplete();
+        });
+        createPublisher.subscribe(data->log.info("Create " + data),err->{log.error(err.getMessage());},()->log.info("Create done!"));
+
+
+
+    }
+}
+********************************************************************************************
+
+Problems and Use case in rxjava:
+
+Producer produces data very fast where as consumer is very slow in processing /consuming:
+.........................................................................................
+
+BackPressure:
+  DownStream/Subscriber is not able handle the data produced by Producer very fast.
+
+Solution:
+  You need to handle back pressure.
+
+Rxjava 1.x provided lot of api to handle backpressure through code.
+
+While community was working with back pressure.
+
+How provide backPressure handling feature at api level or Publisher level?
+
+Soultion : Publisher level, in order to provide publisher , Many companies joined together
+
+who published another spec "Reactive Stream"
+
+Reactive Streams is an initiative to provide a standard for asynchronous stream processing with non-blocking back pressure. This encompasses efforts aimed at runtime environments (JVM and JavaScript) as well as network protocols.
+
+
+The Team provided common spec:
+
+1.Publisher
+2.Subscriber
+3.Subscription
+4.Processor
+
+After this spec published, Rxjava team relased new version - Rxjava 2 which implements reactive stream specification..
+
+Object : publisher
+
+Flowable =====Observable
+
+But still people not happy, which has existing Observables, no non blocking/async processing.
+
+**********************************************************************************************
+                                      Birth of Project Reactor
+
+
+Project Reactor born with 
+- simple , meaning full Publisher apis
+- BackPressure Ready
+- Non Blocking Ready-Netty Engine Engine
+
+How Project Reactor Handles BackPressure:
+
+  "Defered pull-push" : Reactive pull
+
+ Defered means "postphone/dealy" : consumer can delay consuming data.
+ Consumer can tell producer give N elements only.
+
+Project Reactor has slogon ----->  "Nothing happens until you subscribe"
+
+Pull because at the subscription and request steps, the Subscriber will send a signal to producer /upstream to the source and essentially pull the next chunk of dat
+
+  Producer pushes data , where consumer pulls data 
+
+*********************************************************************************************
+
+Project Reactor Types:(Publisher Types)
+
+1.Mono ----Single (In RxJava)
+2.Flux ----Observable/Flowable(Rxjava2)
+
+
+
+Publisher is emitter who emits data
+
+Subscriber is receiving data.
+
+Subscription is "session" between Producer and Subscriber
+
+Processor = Publisher + Subscribers  : acting as publishers and subscribers.
+
+********************************************************************************************
+
+reactive Streams api;
+
+package org.reactivestreams;
+
+public interface Publisher<T> {
+    void subscribe(Subscriber<? super T> var1);
+}
+
+reactor extension
+
+package reactor.core;
+
+import org.reactivestreams.Publisher;
+
+public interface CorePublisher<T> extends Publisher<T> {
+    void subscribe(CoreSubscriber<? super T> var1);
+}
+
+implementation class
+
+public abstract class Mono<T> implements CorePublisher<T> {
+....
+}
+public abstract class Flux<T> implements CorePublisher<T> {
+....
+}
+Subscribers:
+
+package org.reactivestreams;
+
+public interface Subscriber<T> {
+    void onSubscribe(Subscription var1);
+
+    void onNext(T var1);
+
+    void onError(Throwable var1);
+
+    void onComplete();
+}
+
+package reactor.core;
+
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+import reactor.util.context.Context;
+
+public interface CoreSubscriber<T> extends Subscriber<T> {
+    default Context currentContext() {
+        return Context.empty();
+    }
+
+    void onSubscribe(Subscription var1);
+}
+
+*****************************************************************************************
+
+
+Subscription:
+.............
+  Session between Producer and Subscriber
+
+
+public interface Subscription {
+    void request(long var1); // how many elements subscriber can handle: kind of backPressure
+
+    void cancel(); // to close session between Producer and subscriber.
+}
+
+******************************************************************************************
+
+Flux :
+
+ Flux<T>  is a standard Publisher<T> that represents async sequence of 0 to N emitted items.
+ Optionally terminated by either completion signal or an Error 
+
+Create Source(Producer):
+........................
+
+Flux is abstract class provides factory apis through which you can create Flux implementation(Producer)
+
+
+package com.cts.reactor;
+
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+
+@Slf4j
+public class FluxPublisher {
+    public static void main(String[] args) {
+        //create Producer from scratch
+        Flux<String> producer = Flux.create(fluxSink -> {
+            fluxSink.next("Hello reactor");
+            fluxSink.next("Hello reactor");
+            fluxSink.next("Hello reactor");
+            fluxSink.next("Hello reactor");
+            fluxSink.next("Hello reactor");
+            fluxSink.next("Hello reactor");
+            fluxSink.complete();
+
+        });
+        producer.log().subscribe();
+
+        //Create Producer from biz logic
+        Flux<String> loginProducer = Flux.create(fluxSink->{
+            String username ="admin";
+            String password = "adminxx";
+            if(username.equals("admin") && password.equals("admin")){
+                fluxSink.next("Login Success");
+            }else{
+                fluxSink.error(new RuntimeException("Login Failed"));
+            }
+            fluxSink.complete();
+        });
+
+        loginProducer.log().subscribe();
+
+
+    }
+}
+
+*********************************************************************************************
+
+Data Sources:
+ Can be any thing 
+ from primitive,objects,arrays,List,collections...
+
+Sequence of same type of data:
+ just
+
+package com.cts.reactor;
+
+import reactor.core.publisher.Flux;
+
+public class FluxJust {
+    public static void main(String[] args) {
+        Flux<Integer> producer=Flux.just(1,2,3,4,5,6,7,8,9,10);
+        producer.log().subscribe();
+    }
+}
+
+package com.cts.reactor;
+
+import reactor.core.publisher.Flux;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class FluxCollections {
+    public static void main(String[] args) {
+        //List as data Source
+        List<Integer> numList = Arrays.asList(1,2,3,4,5,57);
+        Flux<Integer> producerList= Flux.fromIterable(numList);
+        producerList.log().subscribe();
+
+        Integer [] data = {1,2,3,4,5};
+        Flux<Integer> producerArray= Flux.fromArray(data);
+        producerArray.log().subscribe();
+
+        //sequence of numbers from start to end : range
+        Flux<Integer> rangeProducer = Flux.range(1,100);
+        rangeProducer.log().subscribe();
+
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				
+
+
+
+
+
+
