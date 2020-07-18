@@ -17,9 +17,15 @@ public class FluxCollections {
         producerArray.log().subscribe();
 
         //sequence of numbers from start to end : range
-        Flux<Integer> rangeProducer = Flux.range(1,100);
-        rangeProducer.log().subscribe();
-
+        Flux<Integer> rangeProducer = Flux.range(1,10);
+        //rangeProducer.log().subscribe();
+        //rangeProducer.subscribe(System.out::println,System.out::println,()-> System.out.println("Done"));
+        rangeProducer.doOnSubscribe(subscription->{
+            System.out.println("Subscription is called");
+        }).doOnNext(System.out::println)
+          .doOnError(System.out::println)
+          .doOnComplete(()-> System.out.println("doe"))
+           .subscribe();
 
     }
 }
