@@ -1411,12 +1411,23 @@ Use case 2 : how to return static fallback value:
 package com.cts.reactor.errhandling;
 
 import reactor.core.publisher.Flux;
+package com.cts.reactor.errhandling;
+
+import reactor.core.publisher.Flux;
 
 public class SimpleErrorHandling {
     private static String doSomething(int i) {
         // System.out.println(i);
         if (i == 5) {
             throw new RuntimeException("sorry");
+        }
+        return Integer.toString(i);
+    }
+
+    private static String doSomethingboom(int i) {
+        // System.out.println(i);
+        if (i == 5) {
+            throw new RuntimeException("boom10");
         }
         return Integer.toString(i);
     }
@@ -1456,14 +1467,6 @@ public class SimpleErrorHandling {
                 .onErrorReturn("RECOVERED")
                 .subscribe(v -> System.out.println(v), err -> System.out.println(err));
 
-        Flux.range(1, 10)
-                .map(v -> doSomething(v))
-                .onErrorReturn("FALLBACK") // FALLBACK MESSAGE CAN BE RETURNED BASED ON CONDITION
-                .doFinally((e) -> {
-                    System.out.println("finally");
-                })
-                .subscribe(v -> System.out.println(v), err -> System.out.println(err));
-
         /**
          * Fallback method
          *   try {
@@ -1476,16 +1479,266 @@ public class SimpleErrorHandling {
          *             result = getFromCache("key1");
          *          }
          */
-//        Flux.range(1, 10)
-//              .flatMap(value->doSomething(value)).onErrorResume(er->getFromCache(e));
+        Flux.range(1, 10)
+                .map(v -> doSomething(v))
+                .onErrorReturn(getFromCache())
+                .subscribe(v -> System.out.println(v), err -> System.out.println(err));
 
-        //catch and rethrow
-        // Flux.range(1, 10).flatMap(value->doSomething(value)).onErrorResume(err->
-        //   Flux.error(new CustomException("sss",err))
-        // );
+        //Return something for particular method
+        Flux.range(1, 10)
+                .map(v -> doSomethingboom(v))
+                .onErrorReturn(e -> e.getMessage().equals("boom10"), "recovered10")
+                .subscribe(v -> System.out.println(v), err -> System.out.println(err));
+
+
+
+    }
+
+    private static String getFromCache() {
+        return "Recovered from Fallback method :Result from cache";
     }
 
 
 }
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+                                                     Spring Web Flux
+.....................................................................................................................
+
+Web Application on Java and Spring:
+..................................
+
+All web applications are written by using java techonlogy based on a spec called "Servlet Spec".
+
+Servlet apis are multi threaded model, blocking api.
+
+Request Per Thread, Thread is created for each request
+
+if more requests, you can see more threads.
+
+if a thread spends lot of time serving clients, which degrades performance,blocking , waiting.....
+
+A single thread is used to perform end to end client operations
+
+  client ---requests----pdf report-------------|----create a thread------->pdf service program------jdbc--|--db
+					   write pdf into socket 		 |
+                                                               |                  ---														   convert data into pdf
+										 |
+							       |--------	 write pdf into file server
+                                                             response is ready
+
+Servlet containers who implements servlet spec, follows the perclient request-thread model
+
+
+In this arch, more and more threads, now we need to think how to improve this?
+-Scalability
+     -Verticle
+     -Horizontal 
+
+
+
+*****************************************************************************************************************
+
+Having a minimum no of fixed/ flexiable threads , how to serve the clients
+
+
+                          "Async Programming /Non Blocking " Archiecture.
+
+
+Web flux is standard spec based on "Reactive,nonblocking/async" architecture:
+
+
+Event loop :
+
+ It is thread , whoes responsiblity, receive requests, isloate into a separate thread, grab results and send the results back to users.
+
+This arch brought from node.js
+
+How event loop threads per process?
+
+in node js , only one event loop. since v8 javascript runtime having single threaded.
+
+
+Spring Web flux / Vertx , both provides more event loop threads ? based on server cpu cores. 
+
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+coding styles:
+
+
+1.imperative
+
+eg sort an array
+
+  loop
+    if condition
+          newarry=store all data
+          swapping
+    
+  end loop
+
+1.maintaince issues
+2.in consistency
+3.scalability
+   
+
+2.delcartive
+
+ list().stream().sort().collect()
+
+ response().bodyToMono().subscribeOn(sh).sort().map().filter().....subscribe
+
+
+if you want to write async,non blocking ,declarative code : you need functional programming.
+
+  Java 8 lambdas  ; using this you can compose your application async flows.
+  Reactor uses java 8 lambdas, function composition, higher order function,pure function ......................
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+Spring HTTP Client Apis:
+
+1.RestTemplate - Blocking Api
+
+  Controller A---- block------Controller B
+
+2.WebClient -NonBlocking,reactive api
+
+
+Containers:
+
+1.Pure Reactive Container
+ 
+  -Netty container
+  -undertow
+
+2.Reactive Applicaition on Existing Servlet Container
+
+  Servlet 3.1.spec  : async Servlets
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+Spring WebFlux is spring boot module.
+
+ spring-webflux
+
+   provides reactive http and websocket ,server and clients.
+    -REST ,html browser and web socket style interactions
+
+
+Types of WebFlux:
+
+HttpHandler:
+..........
+
+org.springframework.http.server.reactive
+Interface HttpHandler
+
+reactor.core.publisher.Mono<Void>	handle(ServerHttpRequest request, ServerHttpResponse response)
+Handle the given request and write to the response.
+
+
+
+org.springframework.http.server.reactive
+Interface ServerHttpRequest
+Represents a reactive server-side HTTP request.
+
+
+org.springframework.http.server.reactive
+Interface ServerHttpResponse
+
+Represents a reactive server-side HTTP response.
+
+
+HttpHandler handler=........
+
+ReactorHttpHandlerAdapter adpater=new ReactorHttpHandlerAdapter(handler);
+HttpServer.create().host(host).port(port).handle(adapter).bind().block();
+
+
+WebHandler:
+
+ Provides a reactive extension for other features
+
+ -session handling
+ -filters
+ -Serialization and deserilzation.
+
+
+Request Interface ReactiveHttpInputMessage
+
+reactor.core.publisher.Flux<DataBuffer>	getBody()
+Return the body of the message as a Publisher.
+
+
+org.springframework.core.io.buffer
+Interface DataBuffer  Basic abstraction over byte buffers.
+
+
+Response:Interface ReactiveHttpOutputMessage
+
+Basic abstraction over byte buffers.
+reactor.core.publisher.Mono<Void>	writeWith(org.reactivestreams.Publisher<? extends DataBuffer> body)
+Use the given Publisher to write the body of the message to the underlying HTTP layer.
+
+
+Codecs: 
+  Encoder and Decorder are low level contractrs to encode and decode content indepentent 
+of HTTP.
+
+ HttpMessageReader and HttpMessageWriter contracts to encode and decode http message content
+
+Codecs supported by spring
+
+JACKSON2DECODER AND JACKSON2ENCODER
+
+
+ Flux<DataBuffer>  <------> Flux<T>
+  
+ Mono<List<T>
+ Mono<T>
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+Code:
+ ->Reactive Web Client Implementation
+ ->Reactive Controllers
+        -Annotation style
+        -Functional Style.
+
+
+
+Reactive Functional Web Apis:
+.............................
+org.springframework.web.reactive.function.server
+
+RouterFunctions
+Central entry point to Spring's functional web framework. Exposes routing functionality, such as to create a RouterFunction using a discoverable builder-style API, to create a RouterFunction given a RequestPredicate and HandlerFunction, and to do further subrouting on an existing routing function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
